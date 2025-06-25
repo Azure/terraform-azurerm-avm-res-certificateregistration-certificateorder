@@ -27,12 +27,10 @@ resource "azurerm_role_assignment" "this" {
 }
 
 resource "azapi_resource" "app_service_certificate_order" {
-  type      = "Microsoft.CertificateRegistration/certificateOrders@2021-01-01"
-  parent_id = data.azapi_resource.rg.id
-  name      = var.name
   location  = var.app_service_certificate_order_location
-  tags      = var.tags
-
+  name      = var.name
+  parent_id = data.azapi_resource.rg.id
+  type      = "Microsoft.CertificateRegistration/certificateOrders@2021-01-01"
   body = {
     properties = { for k, v in {
       autoRenew         = var.auto_renew
@@ -44,6 +42,12 @@ resource "azapi_resource" "app_service_certificate_order" {
       } : k => v if v != null && v != ""
     }
   }
+  create_headers         = { "User-Agent" : local.avm_azapi_header }
+  delete_headers         = { "User-Agent" : local.avm_azapi_header }
+  read_headers           = { "User-Agent" : local.avm_azapi_header }
+  response_export_values = ["id", "name", "location", "tags", "properties.autoRenew", "properties.csr", "properties.distinguishedName", "properties.keySize", "properties.productType", "properties.validityInYears"]
+  tags                   = var.tags
+  update_headers         = { "User-Agent" : local.avm_azapi_header }
 
   lifecycle {
     precondition {
@@ -51,34 +55,24 @@ resource "azapi_resource" "app_service_certificate_order" {
       error_message = "`csr` and `distinguished_name` cannot be set together."
     }
   }
-
-  response_export_values = ["id", "name", "location", "tags", "properties.autoRenew", "properties.csr", "properties.distinguishedName", "properties.keySize", "properties.productType", "properties.validityInYears"]
-
-  create_headers = { "User-Agent" : local.avm_azapi_header }
-  delete_headers = { "User-Agent" : local.avm_azapi_header }
-  read_headers   = { "User-Agent" : local.avm_azapi_header }
-  update_headers = { "User-Agent" : local.avm_azapi_header }
 }
 
 resource "azapi_resource" "app_service_certificate_order_key_vault_store" {
   count = var.certificate_order_key_vault_store != null ? 1 : 0
 
-  type      = "Microsoft.CertificateRegistration/certificateOrders/certificates@2021-01-01"
-  parent_id = azapi_resource.app_service_certificate_order.id
   name      = var.certificate_order_key_vault_store.name
-  tags      = var.certificate_order_key_vault_store.tags
-
+  parent_id = azapi_resource.app_service_certificate_order.id
+  type      = "Microsoft.CertificateRegistration/certificateOrders/certificates@2021-01-01"
   body = {
     properties = {
       keyVaultId         = var.certificate_order_key_vault_store.key_vault_id
       keyVaultSecretName = var.certificate_order_key_vault_store.key_vault_secret_name
     }
   }
-
-  ignore_casing = true
-
   create_headers = { "User-Agent" : local.avm_azapi_header }
   delete_headers = { "User-Agent" : local.avm_azapi_header }
+  ignore_casing  = true
   read_headers   = { "User-Agent" : local.avm_azapi_header }
+  tags           = var.certificate_order_key_vault_store.tags
   update_headers = { "User-Agent" : local.avm_azapi_header }
 }

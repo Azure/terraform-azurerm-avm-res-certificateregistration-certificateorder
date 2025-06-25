@@ -1,6 +1,6 @@
-variable "resource_group_name" {
+variable "app_service_certificate_order_location" {
   type        = string
-  description = "(Required) The resource group where the resources will be deployed. Changing this forces a new resource to be created."
+  description = "(Required) Specifies the supported Azure location where the resource exists. Changing this forces a new resource to be created. Currently the only valid value is `global`."
   nullable    = false
 }
 
@@ -16,64 +16,16 @@ variable "name" {
   nullable    = false
 }
 
-variable "app_service_certificate_order_location" {
+variable "resource_group_name" {
   type        = string
-  description = "(Required) Specifies the supported Azure location where the resource exists. Changing this forces a new resource to be created. Currently the only valid value is `global`."
+  description = "(Required) The resource group where the resources will be deployed. Changing this forces a new resource to be created."
   nullable    = false
 }
 
 variable "auto_renew" {
   type        = bool
-  description = "(Optional) true if the certificate should be automatically renewed when it expires; otherwise, false. Defaults to `true`."
   default     = true
-}
-
-variable "csr" {
-  type        = string
-  description = "(Optional) Last CSR that was created for this order."
-  default     = null
-}
-
-variable "distinguished_name" {
-  type        = string
-  description = "(Optional) The Distinguished Name for the App Service Certificate Order."
-  default     = null
-}
-
-variable "key_size" {
-  type        = number
-  description = "(Optional) Certificate key size. Defaults to `2048`."
-  default     = 2048
-  validation {
-    condition     = var.key_size >= 0
-    error_message = "`key_size` must be greater than or equal to 0."
-  }
-}
-
-variable "product_type" {
-  type        = string
-  description = "(Optional) Certificate product type, such as `Standard` or `WildCard`. Defaults to `Standard`."
-  default     = "Standard"
-  validation {
-    condition     = contains(["Standard", "WildCard"], var.product_type)
-    error_message = "`product_type` must be one of: `Standard`, `WildCard`."
-  }
-}
-
-variable "validity_in_years" {
-  type        = number
-  description = "(Optional) Duration in years (must be between `1` and `3`). Defaults to `1`."
-  default     = 1
-  validation {
-    condition     = var.validity_in_years >= 1 && var.validity_in_years <= 3
-    error_message = "`validity_in_years` must be between 1 and 3 inclusive."
-  }
-}
-
-variable "tags" {
-  type        = map(string)
-  default     = null
-  description = "(Optional) A mapping of tags which should be assigned to the App Service Certificate Order."
+  description = "(Optional) true if the certificate should be automatically renewed when it expires; otherwise, false. Defaults to `true`."
 }
 
 variable "certificate_order_key_vault_store" {
@@ -95,6 +47,18 @@ A map of App Servicce Certificate Order Key Vault Stores to create on App Servic
 DESCRIPTION
 }
 
+variable "csr" {
+  type        = string
+  default     = null
+  description = "(Optional) Last CSR that was created for this order."
+}
+
+variable "distinguished_name" {
+  type        = string
+  default     = null
+  description = "(Optional) The Distinguished Name for the App Service Certificate Order."
+}
+
 variable "enable_telemetry" {
   type        = bool
   default     = true
@@ -104,6 +68,17 @@ For more information see <https://aka.ms/avm/telemetryinfo>.
 If it is set to false, then no telemetry will be collected.
 DESCRIPTION
   nullable    = false
+}
+
+variable "key_size" {
+  type        = number
+  default     = 2048
+  description = "(Optional) Certificate key size. Defaults to `2048`."
+
+  validation {
+    condition     = var.key_size >= 0
+    error_message = "`key_size` must be greater than or equal to 0."
+  }
 }
 
 variable "lock" {
@@ -122,6 +97,17 @@ DESCRIPTION
   validation {
     condition     = var.lock != null ? contains(["CanNotDelete", "ReadOnly"], var.lock.kind) : true
     error_message = "The lock level must be one of: 'None', 'CanNotDelete', or 'ReadOnly'."
+  }
+}
+
+variable "product_type" {
+  type        = string
+  default     = "Standard"
+  description = "(Optional) Certificate product type, such as `Standard` or `WildCard`. Defaults to `Standard`."
+
+  validation {
+    condition     = contains(["Standard", "WildCard"], var.product_type)
+    error_message = "`product_type` must be one of: `Standard`, `WildCard`."
   }
 }
 
@@ -152,4 +138,21 @@ A map of role assignments to create on this resource. The map key is deliberatel
 > Note: only set `skip_service_principal_aad_check` to true if you are assigning a role to a service principal.
 DESCRIPTION
   nullable    = false
+}
+
+variable "tags" {
+  type        = map(string)
+  default     = null
+  description = "(Optional) A mapping of tags which should be assigned to the App Service Certificate Order."
+}
+
+variable "validity_in_years" {
+  type        = number
+  default     = 1
+  description = "(Optional) Duration in years (must be between `1` and `3`). Defaults to `1`."
+
+  validation {
+    condition     = var.validity_in_years >= 1 && var.validity_in_years <= 3
+    error_message = "`validity_in_years` must be between 1 and 3 inclusive."
+  }
 }

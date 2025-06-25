@@ -37,10 +37,10 @@ resource "azapi_resource" "resource_group" {
 }
 
 resource "azapi_resource" "key_vault" {
-  type      = "Microsoft.KeyVault/vaults@2021-10-01"
-  parent_id = azapi_resource.resource_group.id
-  name      = "kv-${random_string.name_suffix.id}"
   location  = azapi_resource.resource_group.location
+  name      = "kv-${random_string.name_suffix.id}"
+  parent_id = azapi_resource.resource_group.id
+  type      = "Microsoft.KeyVault/vaults@2021-10-01"
   body = {
     properties = {
       accessPolicies = [
@@ -138,10 +138,10 @@ resource "azapi_resource" "key_vault" {
 }
 
 resource "azapi_resource" "dns_zone" {
-  type      = "Microsoft.Network/dnsZones@2018-05-01"
-  parent_id = azapi_resource.resource_group.id
-  name      = "dnszone${random_string.name_suffix.id}.com"
   location  = "global"
+  name      = "dnszone${random_string.name_suffix.id}.com"
+  parent_id = azapi_resource.resource_group.id
+  type      = "Microsoft.Network/dnsZones@2018-05-01"
 }
 
 # This is the module call
@@ -151,21 +151,12 @@ resource "azapi_resource" "dns_zone" {
 module "test" {
   source = "../../"
 
-  # source              = "Azure/avm-res-app-service-certificate-order"
-  location                               = azapi_resource.resource_group.location
-  resource_group_name                    = azapi_resource.resource_group.name
-  name                                   = "app-service-certificate-order-${random_string.name_suffix.id}"
   app_service_certificate_order_location = "global"
-  auto_renew                             = false
-  distinguished_name                     = "CN=${azapi_resource.dns_zone.name}"
-  key_size                               = 2048
-  product_type                           = "Standard"
-  validity_in_years                      = 1
-
-  tags = {
-    environment = "test"
-  }
-
+  # source              = "Azure/avm-res-app-service-certificate-order"
+  location            = azapi_resource.resource_group.location
+  name                = "app-service-certificate-order-${random_string.name_suffix.id}"
+  resource_group_name = azapi_resource.resource_group.name
+  auto_renew          = false
   certificate_order_key_vault_store = {
     name                  = "store1-${random_string.name_suffix.id}"
     key_vault_id          = azapi_resource.key_vault.id
@@ -175,8 +166,14 @@ module "test" {
       env = "Test"
     }
   }
-
-  enable_telemetry = var.enable_telemetry # see variables.tf
+  distinguished_name = "CN=${azapi_resource.dns_zone.name}"
+  enable_telemetry   = var.enable_telemetry # see variables.tf
+  key_size           = 2048
+  product_type       = "Standard"
+  tags = {
+    environment = "test"
+  }
+  validity_in_years = 1
 
   depends_on = [azapi_resource.resource_group]
 }

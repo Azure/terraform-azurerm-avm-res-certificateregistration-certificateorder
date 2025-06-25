@@ -4,34 +4,21 @@
 This deploys the App Service Certificate Order.
 
 ```hcl
-terraform {
-  required_version = "~> 1.5"
-  required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "~> 4.21"
-    }
-    modtm = {
-      source  = "azure/modtm"
-      version = "~> 0.3"
-    }
-    random = {
-      source  = "hashicorp/random"
-      version = "~> 3.5"
-    }
-  }
-}
-
-provider "azurerm" {
-  features {}
-}
-
-
 ## Section to provide a random Azure region for the resource group
 # This allows us to randomize the region for the resource group.
 module "regions" {
   source  = "Azure/avm-utl-regions/azurerm"
-  version = "~> 0.1"
+  version = "~> 0.5"
+}
+
+data "azurerm_client_config" "current" {}
+
+data "azuread_service_principal" "cert_spn" {
+  display_name = "Microsoft.Azure.CertificateRegistration"
+}
+
+data "azuread_service_principal" "app_service_spn" {
+  display_name = "Microsoft Azure App Service"
 }
 
 # This allows us to randomize the region for the resource group.
@@ -41,16 +28,126 @@ resource "random_integer" "region_index" {
 }
 ## End of section to provide a random Azure region for the resource group
 
-# This ensures we have unique CAF compliant names for our resources.
-module "naming" {
-  source  = "Azure/naming/azurerm"
-  version = "~> 0.3"
+resource "random_string" "name_suffix" {
+  length  = 5
+  lower   = true
+  numeric = false
+  special = false
+  upper   = false
 }
 
-# This is required for resource modules
-resource "azurerm_resource_group" "this" {
+resource "azapi_resource" "resource_group" {
   location = module.regions.regions[random_integer.region_index.result].name
-  name     = module.naming.resource_group.name_unique
+  name     = "avm-res-app-service-certificate-order-${random_string.name_suffix.result}"
+  type     = "Microsoft.Resources/resourceGroups@2024-11-01"
+}
+
+resource "azapi_resource" "key_vault" {
+  location  = azapi_resource.resource_group.location
+  name      = "kv-${random_string.name_suffix.id}"
+  parent_id = azapi_resource.resource_group.id
+  type      = "Microsoft.KeyVault/vaults@2021-10-01"
+  body = {
+    properties = {
+      accessPolicies = [
+        {
+          objectId = data.azurerm_client_config.current.object_id
+          permissions = {
+            certificates = [
+              "Create",
+              "Delete",
+              "Get",
+              "Purge",
+              "Import",
+              "List"
+            ]
+            keys = [
+            ]
+            secrets = [
+              "Delete",
+              "Get",
+              "Purge",
+              "Set",
+              "List"
+            ]
+            storage = [
+            ]
+          }
+          tenantId = data.azurerm_client_config.current.tenant_id
+        },
+        {
+          objectId = data.azuread_service_principal.app_service_spn.object_id
+          permissions = {
+            certificates = [
+              "Create",
+              "Delete",
+              "Get",
+              "Purge",
+              "Import",
+              "List"
+            ]
+            keys = [
+            ]
+            secrets = [
+              "Delete",
+              "Get",
+              "Purge",
+              "Set",
+              "List"
+            ]
+            storage = [
+            ]
+          }
+          tenantId = data.azurerm_client_config.current.tenant_id
+        },
+        {
+          objectId = data.azuread_service_principal.cert_spn.object_id
+          permissions = {
+            certificates = [
+              "Create",
+              "Delete",
+              "Get",
+              "Purge",
+              "Import",
+              "List"
+            ]
+            keys = [
+            ]
+            secrets = [
+              "Delete",
+              "Get",
+              "Purge",
+              "Set",
+              "List"
+            ]
+            storage = [
+            ]
+          }
+          tenantId = data.azurerm_client_config.current.tenant_id
+        }
+      ]
+      createMode                   = "default"
+      enableRbacAuthorization      = false
+      enableSoftDelete             = false
+      enabledForDeployment         = false
+      enabledForDiskEncryption     = false
+      enabledForTemplateDeployment = false
+      publicNetworkAccess          = "Enabled"
+      sku = {
+        family = "A"
+        name   = "standard"
+      }
+      softDeleteRetentionInDays = 7
+      tenantId                  = data.azurerm_client_config.current.tenant_id
+    }
+  }
+}
+
+resource "azapi_resource" "dns_zone" {
+  location  = "global"
+  name      = "dnszone${random_string.name_suffix.id}.com"
+  parent_id = azapi_resource.resource_group.id
+  type      = "Microsoft.Network/dnsZones@2018-05-01"
 }
 
 # This is the module call
@@ -59,13 +156,32 @@ resource "azurerm_resource_group" "this" {
 # with a data source.
 module "test" {
   source = "../../"
-  # source             = "Azure/avm-<res/ptn>-<name>/azurerm"
-  # ...
-  location            = azurerm_resource_group.this.location
-  name                = "TODO" # TODO update with module.naming.<RESOURCE_TYPE>.name_unique
-  resource_group_name = azurerm_resource_group.this.name
 
-  enable_telemetry = var.enable_telemetry # see variables.tf
+  app_service_certificate_order_location = "global"
+  # source              = "Azure/avm-res-app-service-certificate-order"
+  location            = azapi_resource.resource_group.location
+  name                = "app-service-certificate-order-${random_string.name_suffix.id}"
+  resource_group_name = azapi_resource.resource_group.name
+  auto_renew          = false
+  certificate_order_key_vault_store = {
+    name                  = "store1-${random_string.name_suffix.id}"
+    key_vault_id          = azapi_resource.key_vault.id
+    key_vault_secret_name = "kvsec${random_string.name_suffix.id}"
+
+    tags = {
+      env = "Test"
+    }
+  }
+  distinguished_name = "CN=${azapi_resource.dns_zone.name}"
+  enable_telemetry   = var.enable_telemetry # see variables.tf
+  key_size           = 2048
+  product_type       = "Standard"
+  tags = {
+    environment = "test"
+  }
+  validity_in_years = 1
+
+  depends_on = [azapi_resource.resource_group]
 }
 ```
 
@@ -74,20 +190,26 @@ module "test" {
 
 The following requirements are needed by this module:
 
-- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (~> 1.5)
+- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (~> 1.11)
 
-- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 4.21)
+- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.4)
 
-- <a name="requirement_modtm"></a> [modtm](#requirement\_modtm) (~> 0.3)
+- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 4.29)
 
-- <a name="requirement_random"></a> [random](#requirement\_random) (~> 3.5)
+- <a name="requirement_random"></a> [random](#requirement\_random) (~> 3.7)
 
 ## Resources
 
 The following resources are used by this module:
 
-- [azurerm_resource_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) (resource)
+- [azapi_resource.dns_zone](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.key_vault](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.resource_group](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
 - [random_integer.region_index](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/integer) (resource)
+- [random_string.name_suffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/string) (resource)
+- [azuread_service_principal.app_service_spn](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/data-sources/service_principal) (data source)
+- [azuread_service_principal.cert_spn](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/data-sources/service_principal) (data source)
+- [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) (data source)
 
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs
@@ -106,7 +228,7 @@ If it is set to false, then no telemetry will be collected.
 
 Type: `bool`
 
-Default: `true`
+Default: `false`
 
 ## Outputs
 
@@ -116,17 +238,11 @@ No outputs.
 
 The following Modules are called:
 
-### <a name="module_naming"></a> [naming](#module\_naming)
-
-Source: Azure/naming/azurerm
-
-Version: ~> 0.3
-
 ### <a name="module_regions"></a> [regions](#module\_regions)
 
 Source: Azure/avm-utl-regions/azurerm
 
-Version: ~> 0.1
+Version: ~> 0.5
 
 ### <a name="module_test"></a> [test](#module\_test)
 
