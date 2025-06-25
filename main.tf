@@ -27,7 +27,7 @@ resource "azurerm_role_assignment" "this" {
 }
 
 resource "azapi_resource" "app_service_certificate_order" {
-  location  = var.app_service_certificate_order_location
+  location  = var.location
   name      = var.name
   parent_id = data.azapi_resource.rg.id
   type      = "Microsoft.CertificateRegistration/certificateOrders@2021-01-01"
@@ -69,10 +69,10 @@ resource "azapi_resource" "app_service_certificate_order_key_vault_store" {
       keyVaultSecretName = var.certificate_order_key_vault_store.key_vault_secret_name
     }
   }
+  tags           = var.certificate_order_key_vault_store.tags
+  ignore_casing  = true
   create_headers = { "User-Agent" : local.avm_azapi_header }
   delete_headers = { "User-Agent" : local.avm_azapi_header }
-  ignore_casing  = true
   read_headers   = { "User-Agent" : local.avm_azapi_header }
-  tags           = var.certificate_order_key_vault_store.tags
   update_headers = { "User-Agent" : local.avm_azapi_header }
 }

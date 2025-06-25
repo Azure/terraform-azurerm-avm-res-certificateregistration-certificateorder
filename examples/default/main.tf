@@ -151,9 +151,8 @@ resource "azapi_resource" "dns_zone" {
 module "test" {
   source = "../../"
 
-  app_service_certificate_order_location = "global"
-  # source              = "Azure/avm-res-app-service-certificate-order"
-  location            = azapi_resource.resource_group.location
+  # source              = "Azure/terraform-azurerm-avm-res-certificateregistration-certificateorder"
+  location            = "global"
   name                = "app-service-certificate-order-${random_string.name_suffix.id}"
   resource_group_name = azapi_resource.resource_group.name
   auto_renew          = false

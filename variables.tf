@@ -1,9 +1,3 @@
-variable "app_service_certificate_order_location" {
-  type        = string
-  description = "(Required) Specifies the supported Azure location where the resource exists. Changing this forces a new resource to be created. Currently the only valid value is `global`."
-  nullable    = false
-}
-
 variable "location" {
   type        = string
   description = "(Required) Azure region where the resource should be deployed. Changing this forces a new resource to be created."
