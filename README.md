@@ -1,7 +1,7 @@
 <!-- BEGIN_TF_DOCS -->
-# terraform-azurerm-avm-template
+# terraform-azurerm-avm-res-certificateregistration-certificateorder
 
-This is a template repo for Terraform Azure Verified Modules.
+This is an AVM module to deploy App Service Certificate Order.
 
 <!-- markdownlint-disable MD033 -->
 ## Requirements

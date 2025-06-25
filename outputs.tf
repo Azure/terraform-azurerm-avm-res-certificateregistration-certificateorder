@@ -1,6 +1,14 @@
-output "private_endpoints" {
-  description = <<DESCRIPTION
-  A map of the private endpoints created.
-  DESCRIPTION
-  value       = var.private_endpoints_manage_dns_zone_group ? azurerm_private_endpoint.this_managed_dns_zone_groups : azurerm_private_endpoint.this_unmanaged_dns_zone_groups
+output "resource" {
+  description = "The resource of app service certificate order"
+  value       = azapi_resource.app_service_certificate_order
+}
+
+output "resource_id" {
+  description = "The resource ID of app service certificate order"
+  value       = azapi_resource.app_service_certificate_order.id
+}
+
+output "resource_in_azurerm_schema" {
+  description = "The resource of app service certificate order in azurerm schema"
+  value       = local.azurerm_resource_body
 }
