@@ -37,12 +37,6 @@ The following resources are used by this module:
 
 The following input variables are required:
 
-### <a name="input_app_service_certificate_order_location"></a> [app\_service\_certificate\_order\_location](#input\_app\_service\_certificate\_order\_location)
-
-Description: (Required) Specifies the supported Azure location where the resource exists. Changing this forces a new resource to be created. Currently the only valid value is `global`.
-
-Type: `string`
-
 ### <a name="input_location"></a> [location](#input\_location)
 
 Description: (Required) Azure region where the resource should be deployed. Changing this forces a new resource to be created.
