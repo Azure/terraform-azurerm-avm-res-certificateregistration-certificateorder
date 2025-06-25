@@ -75,6 +75,8 @@ resource "azapi_resource" "app_service_certificate_order_key_vault_store" {
     }
   }
 
+  ignore_casing = true
+
   create_headers = { "User-Agent" : local.avm_azapi_header }
   delete_headers = { "User-Agent" : local.avm_azapi_header }
   read_headers   = { "User-Agent" : local.avm_azapi_header }

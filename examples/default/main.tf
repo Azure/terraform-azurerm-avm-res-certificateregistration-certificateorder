@@ -27,7 +27,7 @@ resource "random_string" "name_suffix" {
   lower   = true
   numeric = false
   special = false
-  upper   = true
+  upper   = false
 }
 
 resource "azapi_resource" "resource_group" {
