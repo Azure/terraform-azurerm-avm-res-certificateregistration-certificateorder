@@ -6,17 +6,21 @@ terraform {
       source  = "Azure/azapi"
       version = "~> 2.4"
     }
+    azuread = {
+      source  = "hashicorp/azuread"
+      version = "~> 3.4"
+    }
     azurerm = {
       source  = "hashicorp/azurerm"
       version = "~> 4.29"
-    }
-    modtm = {
-      source  = "azure/modtm"
-      version = "~> 0.3"
     }
     random = {
       source  = "hashicorp/random"
       version = "~> 3.7"
     }
   }
+}
+
+provider "azurerm" {
+  features {}
 }
