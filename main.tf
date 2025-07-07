@@ -42,12 +42,12 @@ resource "azapi_resource" "app_service_certificate_order" {
       } : k => v if v != null && v != ""
     }
   }
-  create_headers         = { "User-Agent" : local.avm_azapi_header }
-  delete_headers         = { "User-Agent" : local.avm_azapi_header }
-  read_headers           = { "User-Agent" : local.avm_azapi_header }
+  create_headers         = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
+  delete_headers         = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
+  read_headers           = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
   response_export_values = ["id", "name", "location", "tags", "properties.autoRenew", "properties.csr", "properties.distinguishedName", "properties.keySize", "properties.productType", "properties.validityInYears"]
   tags                   = var.tags
-  update_headers         = { "User-Agent" : local.avm_azapi_header }
+  update_headers         = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
 
   lifecycle {
     precondition {
@@ -69,10 +69,10 @@ resource "azapi_resource" "app_service_certificate_order_key_vault_store" {
       keyVaultSecretName = var.certificate_order_key_vault_store.key_vault_secret_name
     }
   }
-  create_headers = { "User-Agent" : local.avm_azapi_header }
-  delete_headers = { "User-Agent" : local.avm_azapi_header }
+  create_headers = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
+  delete_headers = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
   ignore_casing  = true
-  read_headers   = { "User-Agent" : local.avm_azapi_header }
+  read_headers   = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
   tags           = var.certificate_order_key_vault_store.tags
-  update_headers = { "User-Agent" : local.avm_azapi_header }
+  update_headers = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
 }
