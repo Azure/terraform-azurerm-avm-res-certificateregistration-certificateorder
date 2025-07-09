@@ -7,9 +7,9 @@ module "regions" {
 
 data "azurerm_client_config" "current" {}
 
-data "azuread_service_principal" "cert_spn" {
-  display_name = "Microsoft.Azure.CertificateRegistration"
-}
+# data "azuread_service_principal" "cert_spn" {
+#   display_name = "Microsoft.Azure.CertificateRegistration"
+# }
 
 data "azuread_service_principal" "app_service_spn" {
   display_name = "Microsoft Azure App Service"
@@ -94,31 +94,31 @@ resource "azapi_resource" "key_vault" {
           }
           tenantId = data.azurerm_client_config.current.tenant_id
         },
-        {
-          objectId = data.azuread_service_principal.cert_spn.object_id
-          permissions = {
-            certificates = [
-              "Create",
-              "Delete",
-              "Get",
-              "Purge",
-              "Import",
-              "List"
-            ]
-            keys = [
-            ]
-            secrets = [
-              "Delete",
-              "Get",
-              "Purge",
-              "Set",
-              "List"
-            ]
-            storage = [
-            ]
-          }
-          tenantId = data.azurerm_client_config.current.tenant_id
-        }
+        # {
+        #   objectId = data.azuread_service_principal.cert_spn.object_id
+        #   permissions = {
+        #     certificates = [
+        #       "Create",
+        #       "Delete",
+        #       "Get",
+        #       "Purge",
+        #       "Import",
+        #       "List"
+        #     ]
+        #     keys = [
+        #     ]
+        #     secrets = [
+        #       "Delete",
+        #       "Get",
+        #       "Purge",
+        #       "Set",
+        #       "List"
+        #     ]
+        #     storage = [
+        #     ]
+        #   }
+        #   tenantId = data.azurerm_client_config.current.tenant_id
+        # }
       ]
       createMode                   = "default"
       enableRbacAuthorization      = false
