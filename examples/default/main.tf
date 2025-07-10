@@ -172,16 +172,7 @@ module "test" {
   distinguished_name = "CN=${azapi_resource.dns_zone.name}"
   enable_telemetry   = var.enable_telemetry # see variables.tf
   key_size           = 2048
-  lock = {
-    kind = "CanNotDelete"
-  }
-  product_type = "Standard"
-  role_assignments = {
-    owner = {
-      role_definition_id_or_name = "Owner"
-      principal_id               = data.azapi_client_config.current.object_id
-    }
-  }
+  product_type       = "Standard"
   tags = {
     environment = "test"
   }
