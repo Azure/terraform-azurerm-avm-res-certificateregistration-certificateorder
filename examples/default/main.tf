@@ -3,9 +3,11 @@
 module "regions" {
   source  = "Azure/avm-utl-regions/azurerm"
   version = "~> 0.5"
+
+  enable_telemetry = var.enable_telemetry
 }
 
-data "azurerm_client_config" "current" {}
+data "azapi_client_config" "current" {}
 
 data "azuread_service_principal" "cert_spn" {
   display_name = "Microsoft.Azure.CertificateRegistration"
@@ -45,7 +47,7 @@ resource "azapi_resource" "key_vault" {
     properties = {
       accessPolicies = [
         {
-          objectId = data.azurerm_client_config.current.object_id
+          objectId = data.azapi_client_config.current.object_id
           permissions = {
             certificates = [
               "Create",
@@ -67,7 +69,7 @@ resource "azapi_resource" "key_vault" {
             storage = [
             ]
           }
-          tenantId = data.azurerm_client_config.current.tenant_id
+          tenantId = data.azapi_client_config.current.tenant_id
         },
         {
           objectId = data.azuread_service_principal.app_service_spn.object_id
@@ -92,7 +94,7 @@ resource "azapi_resource" "key_vault" {
             storage = [
             ]
           }
-          tenantId = data.azurerm_client_config.current.tenant_id
+          tenantId = data.azapi_client_config.current.tenant_id
         },
         {
           objectId = data.azuread_service_principal.cert_spn.object_id
@@ -117,7 +119,7 @@ resource "azapi_resource" "key_vault" {
             storage = [
             ]
           }
-          tenantId = data.azurerm_client_config.current.tenant_id
+          tenantId = data.azapi_client_config.current.tenant_id
         }
       ]
       createMode                   = "default"
@@ -132,7 +134,7 @@ resource "azapi_resource" "key_vault" {
         name   = "standard"
       }
       softDeleteRetentionInDays = 7
-      tenantId                  = data.azurerm_client_config.current.tenant_id
+      tenantId                  = data.azapi_client_config.current.tenant_id
     }
   }
 }
@@ -170,7 +172,16 @@ module "test" {
   distinguished_name = "CN=${azapi_resource.dns_zone.name}"
   enable_telemetry   = var.enable_telemetry # see variables.tf
   key_size           = 2048
-  product_type       = "Standard"
+  lock = {
+    kind = "CanNotDelete"
+  }
+  product_type = "Standard"
+  role_assignments = {
+    owner = {
+      role_definition_id_or_name = "Owner"
+      principal_id               = data.azapi_client_config.current.object_id
+    }
+  }
   tags = {
     environment = "test"
   }

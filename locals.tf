@@ -11,5 +11,4 @@ locals {
     validity_in_years   = azapi_resource.app_service_certificate_order.body.properties.validityInYears
     tags                = azapi_resource.app_service_certificate_order.tags
   }
-  role_definition_resource_substring = "/providers/Microsoft.Authorization/roleDefinitions"
 }

@@ -9,9 +9,11 @@ This deploys the App Service Certificate Order.
 module "regions" {
   source  = "Azure/avm-utl-regions/azurerm"
   version = "~> 0.5"
+
+  enable_telemetry = var.enable_telemetry
 }
 
-data "azurerm_client_config" "current" {}
+data "azapi_client_config" "current" {}
 
 data "azuread_service_principal" "cert_spn" {
   display_name = "Microsoft.Azure.CertificateRegistration"
@@ -51,7 +53,7 @@ resource "azapi_resource" "key_vault" {
     properties = {
       accessPolicies = [
         {
-          objectId = data.azurerm_client_config.current.object_id
+          objectId = data.azapi_client_config.current.object_id
           permissions = {
             certificates = [
               "Create",
@@ -73,7 +75,7 @@ resource "azapi_resource" "key_vault" {
             storage = [
             ]
           }
-          tenantId = data.azurerm_client_config.current.tenant_id
+          tenantId = data.azapi_client_config.current.tenant_id
         },
         {
           objectId = data.azuread_service_principal.app_service_spn.object_id
@@ -98,7 +100,7 @@ resource "azapi_resource" "key_vault" {
             storage = [
             ]
           }
-          tenantId = data.azurerm_client_config.current.tenant_id
+          tenantId = data.azapi_client_config.current.tenant_id
         },
         {
           objectId = data.azuread_service_principal.cert_spn.object_id
@@ -123,7 +125,7 @@ resource "azapi_resource" "key_vault" {
             storage = [
             ]
           }
-          tenantId = data.azurerm_client_config.current.tenant_id
+          tenantId = data.azapi_client_config.current.tenant_id
         }
       ]
       createMode                   = "default"
@@ -138,7 +140,7 @@ resource "azapi_resource" "key_vault" {
         name   = "standard"
       }
       softDeleteRetentionInDays = 7
-      tenantId                  = data.azurerm_client_config.current.tenant_id
+      tenantId                  = data.azapi_client_config.current.tenant_id
     }
   }
 }
@@ -176,7 +178,16 @@ module "test" {
   distinguished_name = "CN=${azapi_resource.dns_zone.name}"
   enable_telemetry   = var.enable_telemetry # see variables.tf
   key_size           = 2048
-  product_type       = "Standard"
+  lock = {
+    kind = "CanNotDelete"
+  }
+  product_type = "Standard"
+  role_assignments = {
+    owner = {
+      role_definition_id_or_name = "Owner"
+      principal_id               = data.azapi_client_config.current.object_id
+    }
+  }
   tags = {
     environment = "test"
   }
@@ -197,8 +208,6 @@ The following requirements are needed by this module:
 
 - <a name="requirement_azuread"></a> [azuread](#requirement\_azuread) (~> 3.0)
 
-- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 4.0)
-
 - <a name="requirement_random"></a> [random](#requirement\_random) (~> 3.7)
 
 ## Resources
@@ -210,9 +219,9 @@ The following resources are used by this module:
 - [azapi_resource.resource_group](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
 - [random_integer.region_index](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/integer) (resource)
 - [random_string.name_suffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/string) (resource)
+- [azapi_client_config.current](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/client_config) (data source)
 - [azuread_service_principal.app_service_spn](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/data-sources/service_principal) (data source)
 - [azuread_service_principal.cert_spn](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/data-sources/service_principal) (data source)
-- [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) (data source)
 
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs
