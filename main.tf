@@ -44,8 +44,9 @@ resource "azapi_resource" "app_service_certificate_order" {
   }
   create_headers         = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
   delete_headers         = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
+  ignore_null_property   = true
   read_headers           = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
-  response_export_values = ["id", "name", "location", "tags", "properties.autoRenew", "properties.csr", "properties.distinguishedName", "properties.keySize", "properties.productType", "properties.validityInYears"]
+  response_export_values = ["*"]
   tags                   = var.tags
   update_headers         = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
 
@@ -58,21 +59,22 @@ resource "azapi_resource" "app_service_certificate_order" {
 }
 
 resource "azapi_resource" "app_service_certificate_order_key_vault_store" {
-  count = var.certificate_order_key_vault_store != null ? 1 : 0
+  for_each = var.certificate_order_key_vault_stores
 
-  name      = var.certificate_order_key_vault_store.name
+  name      = each.value.name
   parent_id = azapi_resource.app_service_certificate_order.id
   type      = "Microsoft.CertificateRegistration/certificateOrders/certificates@2021-01-01"
   body = {
     properties = {
-      keyVaultId         = var.certificate_order_key_vault_store.key_vault_id
-      keyVaultSecretName = var.certificate_order_key_vault_store.key_vault_secret_name
+      keyVaultId         = each.value.key_vault_id
+      keyVaultSecretName = each.value.key_vault_secret_name
     }
   }
-  create_headers = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
-  delete_headers = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
-  ignore_casing  = true
-  read_headers   = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
-  tags           = var.certificate_order_key_vault_store.tags
-  update_headers = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
+  create_headers       = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
+  delete_headers       = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
+  ignore_casing        = true
+  ignore_null_property = true
+  read_headers         = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
+  tags                 = each.value.tags
+  update_headers       = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
 }

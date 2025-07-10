@@ -10,9 +10,9 @@ The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (~> 1.11)
 
-- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.4)
+- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.5)
 
-- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 4.29)
+- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 4.0)
 
 - <a name="requirement_modtm"></a> [modtm](#requirement\_modtm) (~> 0.3)
 
@@ -67,7 +67,7 @@ Type: `bool`
 
 Default: `true`
 
-### <a name="input_certificate_order_key_vault_store"></a> [certificate\_order\_key\_vault\_store](#input\_certificate\_order\_key\_vault\_store)
+### <a name="input_certificate_order_key_vault_stores"></a> [certificate\_order\_key\_vault\_stores](#input\_certificate\_order\_key\_vault\_stores)
 
 Description: A map of App Servicce Certificate Order Key Vault Stores to create on App Service Certificate Order.
 
@@ -79,15 +79,15 @@ Description: A map of App Servicce Certificate Order Key Vault Stores to create 
 Type:
 
 ```hcl
-object({
+map(object({
     name                  = string
     key_vault_id          = string
     key_vault_secret_name = string
-    tags                  = optional(map(string), null)
-  })
+    tags                  = optional(map(string))
+  }))
 ```
 
-Default: `null`
+Default: `{}`
 
 ### <a name="input_csr"></a> [csr](#input\_csr)
 

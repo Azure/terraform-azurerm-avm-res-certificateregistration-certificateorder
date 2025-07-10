@@ -156,13 +156,15 @@ module "test" {
   name                = "app-service-certificate-order-${random_string.name_suffix.id}"
   resource_group_name = azapi_resource.resource_group.name
   auto_renew          = false
-  certificate_order_key_vault_store = {
-    name                  = "store1-${random_string.name_suffix.id}"
-    key_vault_id          = azapi_resource.key_vault.id
-    key_vault_secret_name = "kvsec${random_string.name_suffix.id}"
+  certificate_order_key_vault_stores = {
+    default = {
+      name                  = "store1-${random_string.name_suffix.id}"
+      key_vault_id          = azapi_resource.key_vault.id
+      key_vault_secret_name = "kvsec${random_string.name_suffix.id}"
 
-    tags = {
-      env = "Test"
+      tags = {
+        env = "Test"
+      }
     }
   }
   distinguished_name = "CN=${azapi_resource.dns_zone.name}"

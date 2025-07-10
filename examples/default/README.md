@@ -162,13 +162,15 @@ module "test" {
   name                = "app-service-certificate-order-${random_string.name_suffix.id}"
   resource_group_name = azapi_resource.resource_group.name
   auto_renew          = false
-  certificate_order_key_vault_store = {
-    name                  = "store1-${random_string.name_suffix.id}"
-    key_vault_id          = azapi_resource.key_vault.id
-    key_vault_secret_name = "kvsec${random_string.name_suffix.id}"
+  certificate_order_key_vault_stores = {
+    default = {
+      name                  = "store1-${random_string.name_suffix.id}"
+      key_vault_id          = azapi_resource.key_vault.id
+      key_vault_secret_name = "kvsec${random_string.name_suffix.id}"
 
-    tags = {
-      env = "Test"
+      tags = {
+        env = "Test"
+      }
     }
   }
   distinguished_name = "CN=${azapi_resource.dns_zone.name}"
@@ -191,11 +193,11 @@ The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (~> 1.11)
 
-- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.4)
+- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.5)
 
-- <a name="requirement_azuread"></a> [azuread](#requirement\_azuread) (~> 3.4)
+- <a name="requirement_azuread"></a> [azuread](#requirement\_azuread) (~> 3.0)
 
-- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 4.29)
+- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 4.0)
 
 - <a name="requirement_random"></a> [random](#requirement\_random) (~> 3.7)
 

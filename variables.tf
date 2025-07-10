@@ -22,14 +22,14 @@ variable "auto_renew" {
   description = "(Optional) true if the certificate should be automatically renewed when it expires; otherwise, false. Defaults to `true`."
 }
 
-variable "certificate_order_key_vault_store" {
-  type = object({
+variable "certificate_order_key_vault_stores" {
+  type = map(object({
     name                  = string
     key_vault_id          = string
     key_vault_secret_name = string
-    tags                  = optional(map(string), null)
-  })
-  default     = null
+    tags                  = optional(map(string))
+  }))
+  default     = {}
   description = <<DESCRIPTION
 A map of App Servicce Certificate Order Key Vault Stores to create on App Service Certificate Order.
 
@@ -39,6 +39,7 @@ A map of App Servicce Certificate Order Key Vault Stores to create on App Servic
 - `tags` - A mapping of tags which should be assigned to the App Servicce Certificate Order Key Vault Store.
 
 DESCRIPTION
+  nullable    = false
 }
 
 variable "csr" {
