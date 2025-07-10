@@ -9,7 +9,7 @@ module "avm_interfaces" {
   version = "0.5.0"
 
   enable_telemetry = var.enable_telemetry
-  lock = {
+  lock = var.lock == null ? null : {
     kind = var.lock.kind
     name = coalesce(var.lock.name, "lock-${var.lock.kind}")
   }
