@@ -6,9 +6,9 @@ terraform {
       source  = "Azure/azapi"
       version = "~> 2.5"
     }
-    modtm = {
-      source  = "azure/modtm"
-      version = "~> 0.3"
+    azuread = {
+      source  = "hashicorp/azuread"
+      version = "~> 3.0"
     }
     random = {
       source  = "hashicorp/random"
