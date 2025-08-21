@@ -54,3 +54,5 @@ examples/*/policy
 # intermediate pla files for conftest
 **/tfplan.binary
 **/tfplan.json
+*.mptfbackup
+.avm
