@@ -55,4 +55,4 @@ examples/*/policy
 **/tfplan.binary
 **/tfplan.json
 *.mptfbackup
-.avm
+.avm/managed-files.json
