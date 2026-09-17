@@ -4,7 +4,7 @@ module "regions" {
   source  = "Azure/avm-utl-regions/azurerm"
   version = "~> 0.5"
 
-  enable_telemetry = var.enable_telemetry
+  enable_telemetry = false
 }
 
 data "azapi_client_config" "current" {}
@@ -171,7 +171,7 @@ module "test" {
     }
   }
   distinguished_name = "CN=${azapi_resource.dns_zone.name}"
-  enable_telemetry   = var.enable_telemetry # see variables.tf
+  enable_telemetry   = false # see variables.tf
   key_size           = 2048
   product_type       = "Standard"
   tags = {
