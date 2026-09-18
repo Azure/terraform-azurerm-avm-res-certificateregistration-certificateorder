@@ -1,0 +1,10 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Azure/azure-verified-modules-tools/main/src/Avm.Authoring/Resources/Schemas/v1/avm-module-metadata.schema.json",
+  "moduleDisplayName": "Certificate Orders",
+  "moduleDescription": "AVM Resource Module for Certificate Orders",
+  "canonicalType": "Microsoft.CertificateRegistration/certificateOrders",
+  "owners": [
+    "lonegunmanb"
+  ],
+  "telemetryIdPrefix": "46d3xtrf.res.8811fbd"
+}
