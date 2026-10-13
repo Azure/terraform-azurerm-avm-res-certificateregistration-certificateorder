@@ -9,7 +9,7 @@ This deploys the App Service Certificate Order.
 # This allows us to randomize the region for the resource group.
 module "regions" {
   source  = "Azure/avm-utl-regions/azurerm"
-  version = "~> 0.5"
+  version = "0.12.0"
 
   enable_telemetry = var.enable_telemetry
 }
@@ -247,7 +247,7 @@ The following Modules are called:
 
 Source: Azure/avm-utl-regions/azurerm
 
-Version: ~> 0.5
+Version: 0.12.0
 
 ### <a name="module_test"></a> [test](#module\_test)
 
