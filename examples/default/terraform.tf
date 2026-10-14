@@ -10,6 +10,10 @@ terraform {
       source  = "hashicorp/azuread"
       version = "~> 3.0"
     }
+    modtm = {
+      source  = "Azure/modtm"
+      version = "~> 0.3"
+    }
     random = {
       source  = "hashicorp/random"
       version = "~> 3.7"

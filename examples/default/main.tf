@@ -2,7 +2,12 @@
 # This allows us to randomize the region for the resource group.
 module "regions" {
   source  = "Azure/avm-utl-regions/azurerm"
-  version = "~> 0.5"
+  version = "0.12.0"
+  providers = {
+    azapi  = azapi
+    modtm  = modtm
+    random = random
+  }
 
   enable_telemetry = var.enable_telemetry
 }
@@ -10,7 +15,7 @@ module "regions" {
 data "azapi_client_config" "current" {}
 
 data "azuread_service_principal" "cert_spn" {
-  display_name = "Microsoft.Azure.CertificateRegistration"
+  client_id = "f3c21649-0979-4721-ac85-b0216b2cf413"
 }
 
 data "azuread_service_principal" "app_service_spn" {
@@ -153,6 +158,11 @@ resource "azapi_resource" "dns_zone" {
 # with a data source.
 module "test" {
   source = "../../"
+  providers = {
+    azapi  = azapi
+    modtm  = modtm
+    random = random
+  }
 
   # source              = "Azure/terraform-azurerm-avm-res-certificateregistration-certificateorder"
   location            = "global"
