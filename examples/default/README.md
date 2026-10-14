@@ -4,12 +4,19 @@
 
 This deploys the App Service Certificate Order.
 
+App Service Certificates are supported only in public Azure. The tenant must already contain the [Certificate Registration application](https://learn.microsoft.com/azure/app-service/configure-ssl-app-service-certificate#authorize-app-service-certificate-to-access-azure-key-vault) (`f3c21649-0979-4721-ac85-b0216b2cf413`) and the Microsoft Azure App Service enterprise application.
+
 ```hcl
 ## Section to provide a random Azure region for the resource group
 # This allows us to randomize the region for the resource group.
 module "regions" {
   source  = "Azure/avm-utl-regions/azurerm"
   version = "0.12.0"
+  providers = {
+    azapi  = azapi
+    modtm  = modtm
+    random = random
+  }
 
   enable_telemetry = var.enable_telemetry
 }
@@ -17,7 +24,7 @@ module "regions" {
 data "azapi_client_config" "current" {}
 
 data "azuread_service_principal" "cert_spn" {
-  display_name = "Microsoft.Azure.CertificateRegistration"
+  client_id = "f3c21649-0979-4721-ac85-b0216b2cf413"
 }
 
 data "azuread_service_principal" "app_service_spn" {
@@ -160,6 +167,11 @@ resource "azapi_resource" "dns_zone" {
 # with a data source.
 module "test" {
   source = "../../"
+  providers = {
+    azapi  = azapi
+    modtm  = modtm
+    random = random
+  }
 
   # source              = "Azure/terraform-azurerm-avm-res-certificateregistration-certificateorder"
   location            = "global"
@@ -200,6 +212,8 @@ The following requirements are needed by this module:
 - <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.5)
 
 - <a name="requirement_azuread"></a> [azuread](#requirement\_azuread) (~> 3.0)
+
+- <a name="requirement_modtm"></a> [modtm](#requirement\_modtm) (~> 0.3)
 
 - <a name="requirement_random"></a> [random](#requirement\_random) (~> 3.7)
 
