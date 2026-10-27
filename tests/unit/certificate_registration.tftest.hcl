@@ -101,7 +101,6 @@ override_resource {
 }
 
 variables {
-  location         = "eastus"
   enable_telemetry = false
 }
 
@@ -117,6 +116,11 @@ run "legacy_display_name_control" {
     azuread = azuread.legacy_name
 
     random = random.mock
+  }
+
+  assert {
+    condition     = var.location == "eastus"
+    error_message = "Omitting location must use the example's regional eastus default."
   }
 
   assert {

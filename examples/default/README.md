@@ -221,13 +221,7 @@ The following resources are used by this module:
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs
 
-The following input variables are required:
-
-### <a name="input_location"></a> [location](#input\_location)
-
-Description: (Required) Azure region used for module telemetry and the Regions utility. The Certificate Order remains a global resource.
-
-Type: `string`
+No required inputs.
 
 ## Optional Inputs
 
@@ -242,6 +236,14 @@ If it is set to false, then no telemetry will be collected.
 Type: `bool`
 
 Default: `true`
+
+### <a name="input_location"></a> [location](#input\_location)
+
+Description: (Optional) Azure region used for module telemetry and the Regions utility. Defaults to `eastus`. The Certificate Order remains a global resource.
+
+Type: `string`
+
+Default: `"eastus"`
 
 ## Outputs
 
