@@ -2,13 +2,9 @@
 # This allows us to randomize the region for the resource group.
 module "regions" {
   source  = "Azure/avm-utl-regions/azurerm"
-  version = "0.12.0"
-  providers = {
-    azapi  = azapi
-    modtm  = modtm
-    random = random
-  }
+  version = "0.13.1"
 
+  location         = var.location
   enable_telemetry = var.enable_telemetry
 }
 
@@ -153,19 +149,11 @@ resource "azapi_resource" "dns_zone" {
 }
 
 # This is the module call
-# Do not specify location here due to the randomization above.
-# Leaving location as `null` will cause the module to use the resource group location
-# with a data source.
 module "test" {
   source = "../../"
-  providers = {
-    azapi  = azapi
-    modtm  = modtm
-    random = random
-  }
 
   # source              = "Azure/terraform-azurerm-avm-res-certificateregistration-certificateorder"
-  location            = "global"
+  location            = var.location
   name                = "app-service-certificate-order-${random_string.name_suffix.id}"
   resource_group_name = azapi_resource.resource_group.name
   auto_renew          = false

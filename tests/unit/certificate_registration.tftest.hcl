@@ -3,9 +3,10 @@ mock_provider "azapi" {
 
   mock_data "azapi_client_config" {
     defaults = {
-      object_id       = "00000000-0000-0000-0000-000000000001"
-      subscription_id = "00000000-0000-0000-0000-000000000002"
-      tenant_id       = "00000000-0000-0000-0000-000000000003"
+      object_id                = "00000000-0000-0000-0000-000000000001"
+      subscription_id          = "00000000-0000-0000-0000-000000000002"
+      tenant_id                = "00000000-0000-0000-0000-000000000003"
+      subscription_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000002"
     }
   }
 
@@ -44,10 +45,6 @@ mock_provider "azuread" {
       object_id    = "00000000-0000-0000-0000-000000000004"
     }
   }
-}
-
-mock_provider "modtm" {
-  alias = "mock"
 }
 
 mock_provider "random" {
@@ -104,6 +101,7 @@ override_resource {
 }
 
 variables {
+  location         = "eastus"
   enable_telemetry = false
 }
 
@@ -117,8 +115,8 @@ run "legacy_display_name_control" {
   providers = {
     azapi   = azapi.mock
     azuread = azuread.legacy_name
-    modtm   = modtm.mock
-    random  = random.mock
+
+    random = random.mock
   }
 
   assert {
@@ -149,8 +147,8 @@ run "renamed_certificate_principal" {
   providers = {
     azapi   = azapi.mock
     azuread = azuread.renamed
-    modtm   = modtm.mock
-    random  = random.mock
+
+    random = random.mock
   }
 
   assert {

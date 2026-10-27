@@ -6,8 +6,9 @@ data "azapi_resource" "rg" {
 # In ordinary usage, the lock attribute value would be set to var.lock.
 module "avm_interfaces" {
   source  = "Azure/avm-utl-interfaces/azure"
-  version = "0.5.0"
+  version = "0.9.0"
 
+  location         = var.location
   enable_telemetry = var.enable_telemetry
   lock = var.lock == null ? null : {
     kind = var.lock.kind
@@ -32,7 +33,15 @@ resource "azapi_resource" "lock" {
   name      = module.avm_interfaces.lock_azapi.name != null ? module.avm_interfaces.lock_azapi.name : coalesce(var.lock.name, "lock-${var.lock.kind}")
   parent_id = data.azapi_resource.rg.id
   type      = module.avm_interfaces.lock_azapi.type
-  body      = module.avm_interfaces.lock_azapi.body
+  body = merge(
+    module.avm_interfaces.lock_azapi.body,
+    {
+      properties = {
+        for key, value in module.avm_interfaces.lock_azapi.body.properties :
+        key => value if !(key == "notes" && value == null)
+      }
+    }
+  )
 
   depends_on = [
     azapi_resource.app_service_certificate_order,
@@ -42,7 +51,14 @@ resource "azapi_resource" "lock" {
 resource "azapi_resource" "role_assignments" {
   for_each = module.avm_interfaces.role_assignments_azapi
 
-  name      = each.value.name
+  name = uuidv5(
+    "url",
+    format(
+      "%s%s",
+      each.value.body.properties.principalId,
+      each.value.body.properties.roleDefinitionId
+    )
+  )
   parent_id = data.azapi_resource.rg.id
   type      = each.value.type
   body      = each.value.body
@@ -53,7 +69,7 @@ resource "azapi_resource" "role_assignments" {
 }
 
 resource "azapi_resource" "app_service_certificate_order" {
-  location  = var.location
+  location  = "global"
   name      = var.name
   parent_id = data.azapi_resource.rg.id
   type      = "Microsoft.CertificateRegistration/certificateOrders@2021-01-01"

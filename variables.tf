@@ -1,7 +1,12 @@
 variable "location" {
   type        = string
-  description = "(Required) Azure region where the resource should be deployed. Changing this forces a new resource to be created."
+  description = "(Required) Azure region used for module telemetry. The App Service Certificate Order is a global resource."
   nullable    = false
+
+  validation {
+    condition     = length(trimspace(var.location)) > 0 && lower(trimspace(var.location)) != "global"
+    error_message = "`location` must be a non-empty Azure region for telemetry. The App Service Certificate Order is a global resource and always uses `global`."
+  }
 }
 
 variable "name" {
