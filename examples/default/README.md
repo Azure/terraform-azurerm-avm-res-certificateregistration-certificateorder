@@ -4,20 +4,25 @@
 
 This deploys the App Service Certificate Order.
 
+The `location` input must be an Azure region for telemetry and the Regions utility. The Certificate Order itself remains a global resource.
+
+App Service Certificates are supported only in public Azure. The tenant must already contain the [Certificate Registration application](https://learn.microsoft.com/azure/app-service/configure-ssl-app-service-certificate#authorize-app-service-certificate-to-access-azure-key-vault) (`f3c21649-0979-4721-ac85-b0216b2cf413`) and the Microsoft Azure App Service enterprise application.
+
 ```hcl
 ## Section to provide a random Azure region for the resource group
 # This allows us to randomize the region for the resource group.
 module "regions" {
   source  = "Azure/avm-utl-regions/azurerm"
-  version = "~> 0.5"
+  version = "0.13.1"
 
+  location         = var.location
   enable_telemetry = var.enable_telemetry
 }
 
 data "azapi_client_config" "current" {}
 
 data "azuread_service_principal" "cert_spn" {
-  display_name = "Microsoft.Azure.CertificateRegistration"
+  client_id = "f3c21649-0979-4721-ac85-b0216b2cf413"
 }
 
 data "azuread_service_principal" "app_service_spn" {
@@ -155,14 +160,11 @@ resource "azapi_resource" "dns_zone" {
 }
 
 # This is the module call
-# Do not specify location here due to the randomization above.
-# Leaving location as `null` will cause the module to use the resource group location
-# with a data source.
 module "test" {
   source = "../../"
 
   # source              = "Azure/terraform-azurerm-avm-res-certificateregistration-certificateorder"
-  location            = "global"
+  location            = var.location
   name                = "app-service-certificate-order-${random_string.name_suffix.id}"
   resource_group_name = azapi_resource.resource_group.name
   auto_renew          = false
@@ -197,7 +199,7 @@ The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (~> 1.11)
 
-- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.5)
+- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.12)
 
 - <a name="requirement_azuread"></a> [azuread](#requirement\_azuread) (~> 3.0)
 
@@ -235,6 +237,14 @@ Type: `bool`
 
 Default: `true`
 
+### <a name="input_location"></a> [location](#input\_location)
+
+Description: (Optional) Azure region used for module telemetry and the Regions utility. Defaults to `eastus`. The Certificate Order remains a global resource.
+
+Type: `string`
+
+Default: `"eastus"`
+
 ## Outputs
 
 No outputs.
@@ -247,7 +257,7 @@ The following Modules are called:
 
 Source: Azure/avm-utl-regions/azurerm
 
-Version: ~> 0.5
+Version: 0.13.1
 
 ### <a name="module_test"></a> [test](#module\_test)
 
