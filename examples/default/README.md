@@ -163,8 +163,6 @@ resource "azapi_resource" "dns_zone" {
 module "test" {
   source = "../../"
 
-  # source              = "Azure/terraform-azurerm-avm-res-certificateregistration-certificateorder"
-  location            = var.location
   name                = "app-service-certificate-order-${random_string.name_suffix.id}"
   resource_group_name = azapi_resource.resource_group.name
   auto_renew          = false
@@ -182,7 +180,9 @@ module "test" {
   distinguished_name = "CN=${azapi_resource.dns_zone.name}"
   enable_telemetry   = var.enable_telemetry # see variables.tf
   key_size           = 2048
-  product_type       = "Standard"
+  # source              = "Azure/terraform-azurerm-avm-res-certificateregistration-certificateorder"
+  location     = var.location
+  product_type = "Standard"
   tags = {
     environment = "test"
   }
