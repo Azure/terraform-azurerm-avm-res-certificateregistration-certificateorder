@@ -46,7 +46,6 @@ mock_provider "random" {
 }
 
 variables {
-  location            = "eastus"
   name                = "test-cert"
   resource_group_name = "test-rg"
   distinguished_name  = "CN=example.com"
@@ -141,6 +140,7 @@ run "regional_telemetry_keeps_certificate_global" {
   }
 
   variables {
+    location         = "eastus"
     enable_telemetry = true
   }
 
@@ -166,8 +166,8 @@ run "telemetry_can_be_disabled" {
   }
 
   assert {
-    condition     = length(azapi_resource.telemetry) == 0
-    error_message = "Disabling telemetry must create no telemetry deployment."
+    condition     = var.location == null && length(azapi_resource.telemetry) == 0
+    error_message = "Disabling telemetry must allow location to be omitted and create no telemetry deployment."
   }
 }
 

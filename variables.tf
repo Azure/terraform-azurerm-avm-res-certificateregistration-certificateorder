@@ -1,14 +1,3 @@
-variable "location" {
-  type        = string
-  description = "(Required) Azure region used for module telemetry. The App Service Certificate Order is a global resource."
-  nullable    = false
-
-  validation {
-    condition     = length(trimspace(var.location)) > 0 && lower(trimspace(var.location)) != "global"
-    error_message = "`location` must be a non-empty Azure region for telemetry. The App Service Certificate Order is a global resource and always uses `global`."
-  }
-}
-
 variable "name" {
   type        = string
   description = "(Required) The name of the App Service Certificate Order resource. Changing this forces a new resource to be created."
@@ -78,6 +67,24 @@ variable "key_size" {
   validation {
     condition     = var.key_size >= 0
     error_message = "`key_size` must be greater than or equal to 0."
+  }
+}
+
+variable "location" {
+  type        = string
+  default     = null
+  description = "(Optional) Azure region used for module telemetry. Required when telemetry is enabled. The App Service Certificate Order is a global resource."
+
+  validation {
+    condition     = !var.enable_telemetry || var.location != null
+    error_message = "The location must not be null when telemetry is enabled."
+  }
+  validation {
+    condition = var.location == null ? true : (
+      length(trimspace(var.location)) > 0 &&
+      lower(trimspace(var.location)) != "global"
+    )
+    error_message = "`location` must be a non-empty Azure region for telemetry. The App Service Certificate Order is a global resource and always uses `global`."
   }
 }
 

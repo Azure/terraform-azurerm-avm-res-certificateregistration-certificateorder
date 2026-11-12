@@ -31,12 +31,6 @@ The following resources are used by this module:
 
 The following input variables are required:
 
-### <a name="input_location"></a> [location](#input\_location)
-
-Description: (Required) Azure region used for module telemetry. The App Service Certificate Order is a global resource.
-
-Type: `string`
-
 ### <a name="input_name"></a> [name](#input\_name)
 
 Description: (Required) The name of the App Service Certificate Order resource. Changing this forces a new resource to be created.
@@ -116,6 +110,14 @@ Description: (Optional) Certificate key size. Defaults to `2048`.
 Type: `number`
 
 Default: `2048`
+
+### <a name="input_location"></a> [location](#input\_location)
+
+Description: (Optional) Azure region used for module telemetry. Required when telemetry is enabled. The App Service Certificate Order is a global resource.
+
+Type: `string`
+
+Default: `null`
 
 ### <a name="input_lock"></a> [lock](#input\_lock)
 
@@ -215,7 +217,7 @@ The following Modules are called:
 
 Source: Azure/avm-utl-interfaces/azure
 
-Version: 0.9.0
+Version: 0.10.0
 
 <!-- markdownlint-disable-next-line MD041 -->
 ## Data Collection
