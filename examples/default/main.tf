@@ -44,7 +44,7 @@ resource "azapi_resource" "key_vault" {
   location  = azapi_resource.resource_group.location
   name      = "kv-${random_string.name_suffix.id}"
   parent_id = azapi_resource.resource_group.id
-  type      = "Microsoft.KeyVault/vaults@2021-10-01"
+  type      = "Microsoft.KeyVault/vaults@2026-02-01"
   body = {
     properties = {
       accessPolicies = [
