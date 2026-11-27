@@ -6,7 +6,7 @@ data "azapi_resource" "rg" {
 # In ordinary usage, the lock attribute value would be set to var.lock.
 module "avm_interfaces" {
   source  = "Azure/avm-utl-interfaces/azure"
-  version = "0.10.0"
+  version = "0.10.1"
 
   enable_telemetry = var.enable_telemetry
   location         = var.location
